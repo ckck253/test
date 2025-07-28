@@ -60,20 +60,23 @@
     <h2>Welcome, <span id="student-name"></span></h2>
     <p>Class every Monday - 8:30 PM Lebanon / 6:30 PM UK</p>
 
-    <form
-      id="attendance-form"
-      action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"
-      method="POST"
-      target="_blank"
-      onsubmit="openZoom();"
-    >
-      <input type="hidden" name="entry.274009332" id="form-name" />
-      <button type="submit">Join Zoom & Mark Attendance</button>
-    </form>
-
+    <button onclick="joinZoom()">Join Zoom Class</button>
     <div class="log" id="log"></div>
     <button onclick="logout()" style="background:#e11d48; margin-top:20px;">Logout</button>
   </div>
+
+  <!-- hidden attendance form -->
+  <form
+    id="attendance-form"
+    action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"
+    method="POST"
+    target="dummyFrame"
+    class="hidden"
+  >
+    <input type="hidden" name="entry.274009332" id="form-name" />
+  </form>
+
+  <iframe name="dummyFrame" style="display:none;"></iframe>
 
   <script>
     const users = {
@@ -94,11 +97,23 @@
         document.getElementById("login-box").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("hidden");
         document.getElementById("student-name").textContent = user;
+
+        // Auto-fill and submit attendance
         document.getElementById("form-name").value = user;
+        document.getElementById("attendance-form").submit();
+
+        const now = new Date().toLocaleString();
+        document.getElementById("log").innerHTML =
+          `<p><strong>${user}</strong> attendance logged at ${now}</p>`;
+
         error.textContent = "";
       } else {
         error.textContent = "Incorrect username or password.";
       }
+    }
+
+    function joinZoom() {
+      window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
     }
 
     function logout() {
@@ -108,17 +123,6 @@
       document.getElementById("dashboard").classList.add("hidden");
       document.getElementById("login-box").classList.remove("hidden");
       document.getElementById("log").innerHTML = "";
-    }
-
-    function openZoom() {
-      setTimeout(() => {
-        const now = new Date().toLocaleString();
-        document.getElementById("log").innerHTML =
-          `<p><strong>${currentUser}</strong> joined at ${now}</p>` +
-          document.getElementById("log").innerHTML;
-
-        window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
-      }, 500);
     }
   </script>
 
