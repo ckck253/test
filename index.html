@@ -1,97 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>J</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f4f4;
-      padding: 30px;
-      max-width: 500px;
-      margin: auto;
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-    button {
-      background: #2d89ef;
-      color: white;
-      border: none;
-    }
-    .hidden { display: none; }
-    .log { margin-top: 20px; background: white; padding: 10px; border-radius: 5px; }
-  </style>
+  <title>Join Coding Class</title>
 </head>
 <body>
+  <h2>Coding Class Attendance</h2>
+  <form action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse" method="POST" target="_blank" onsubmit="markTime()">
+    <label>Username:</label><br>
+    <input type="text" name="entry.274009332" required><br><br>
+    
+    <input type="submit" value="Join Zoom & Mark Attendance">
+  </form>
 
-<h2>Coding Class Login</h2>
-
-<div id="login">
-  <input type="text" id="username" placeholder="Username (e.g. joel)">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <div id="login-error" style="color: red;"></div>
-</div>
-
-<div id="student" class="hidden">
-  <p>Welcome <span id="student-name"></span>!</p>
-  <button onclick="joinZoom()">Join Zoom & Submit Attendance</button>
-  <div class="log" id="log"></div>
-</div>
-
-<script>
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse";
-const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1";
-const ENTRY_NAME = "entry.274009332";
-
-const users = {
-  joel: "joel123",
-  ali: "ali456",
-  sara: "sara789"
-};
-
-let loggedIn = "";
-
-function login() {
-  const u = document.getElementById("username").value.trim().toLowerCase();
-  const p = document.getElementById("password").value.trim();
-  const err = document.getElementById("login-error");
-
-  if (users[u] && users[u] === p) {
-    loggedIn = u;
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("student").classList.remove("hidden");
-    document.getElementById("student-name").textContent = u;
-    err.textContent = "";
-  } else {
-    err.textContent = "Wrong username or password.";
-  }
-}
-
-function joinZoom() {
-  if (!loggedIn) return;
-
-  const data = new URLSearchParams();
-  data.append(ENTRY_NAME, loggedIn);
-
-  fetch(GOOGLE_FORM_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: data
-  }).then(() => {
-    const now = new Date().toLocaleString();
-    document.getElementById("log").innerHTML = `Attendance marked for ${loggedIn} at ${now}`;
-    window.open(ZOOM_LINK, "_blank");
-  }).catch(() => {
-    alert("Failed to mark attendance.");
-  });
-}
-</script>
-
+  <script>
+    function markTime() {
+      setTimeout(() => {
+        window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
+      }, 500);
+    }
+  </script>
 </body>
 </html>
