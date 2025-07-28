@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Coding Class Portal</title>
   <style>
     body {
@@ -67,9 +67,9 @@
 
   <div class="container">
     <div id="login-box">
-      <h1>Coingd</h1>
-      <input type="text" id="username" placeholder="Username"/>
-      <input type="password" id="password" placeholder="Password"/>
+      <h1>Coding Class</h1>
+      <input type="text" id="username" placeholder="Username" autocomplete="username"/>
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password"/>
       <button onclick="login()">Login</button>
       <p id="error" style="color: #f87171; text-align:center;"></p>
     </div>
@@ -93,7 +93,7 @@
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwWrUv9USXrq_Fut4OH3nrH-xrecy8kZeRTrhbd54LCn1qNKERGkquxZzHfhfOjXVj1/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby0bbccWl0dOKbE0LAelKXg21-uCFvDpjYxSQs0kwybF1Jx0dhRJSq3YdCMxbbKloKm/exec";
     let zoomLink = "";
 
     function login() {
@@ -108,7 +108,7 @@
 
       fetch(WEB_APP_URL, {
         method: "POST",
-        contentType: "application/json",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
       })
       .then(res => res.json())
@@ -116,6 +116,9 @@
         if (data.success) {
           zoomLink = data.zoomLink;
           errorElem.textContent = "";
+          window.localStorage.setItem('username', username);
+          window.localStorage.setItem('password', password);
+
           document.getElementById("login-box").classList.add("hidden");
 
           if (data.role === "student") {
@@ -137,36 +140,45 @@
     }
 
     function joinZoom() {
-  if (!zoomLink) {
-    alert("Zoom link not available.");
-    return;
-  }
-
-  const username = document.getElementById("student-name").textContent || "unknown";
-
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    contentType: "application/json",
-    body: JSON.stringify({
-      username: username,
-      password: "",         // empty since we're not authenticating again
-      joinClick: true       // custom flag to log Join action
-    })
-  }).then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        window.open(zoomLink, "_blank");
-      } else {
-        alert("Error saving join log: " + data.error);
+      if (!zoomLink) {
+        alert("Zoom link not available.");
+        return;
       }
-    }).catch(err => {
-      console.error("Join click error:", err);
-      alert("Failed to connect to server.");
-    });
-}
 
+      const username = window.localStorage.getItem('username') || "";
+      const password = window.localStorage.getItem('password') || "";
+
+      if (!username || !password) {
+        alert("You must be logged in.");
+        logout();
+        return;
+      }
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username,
+          password: password,
+          joinClick: true
+        })
+      }).then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.open(zoomLink, "_blank");
+          } else {
+            alert("Error saving join log: " + data.error);
+          }
+        }).catch(err => {
+          console.error("Join click error:", err);
+          alert("Failed to connect to server.");
+        });
+    }
 
     function logout() {
+      window.localStorage.removeItem('username');
+      window.localStorage.removeItem('password');
+
       document.getElementById("login-box").classList.remove("hidden");
       document.getElementById("student-box").classList.add("hidden");
       document.getElementById("admin-box").classList.add("hidden");
