@@ -1,191 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coding Class Portal</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f172a;
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-    }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 6px;
-      font-size: 1rem;
-    }
-    input {
-      background: #334155;
-      color: white;
-    }
-    button {
-      background-color: #0ea5e9;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #0284c7;
-    }
-    .hidden {
-      display: none;
-    }
-    .log-box {
-      background: #0f172a;
-      border: 1px solid #334155;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-    .logout-btn {
-      background: #ef4444;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coding Class Login</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #222; color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; margin:0; }
+  #container { background: #333; padding: 30px; border-radius: 10px; width: 320px; }
+  input, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 5px; border: none; }
+  input { font-size: 16px; }
+  button { background: #0af; color: white; font-weight: bold; cursor: pointer; }
+  button:hover { background: #08c; }
+  #error { color: #f66; text-align: center; }
+  #dashboard { display: none; }
+</style>
 </head>
 <body>
 
-  <div class="container">
-    <div id="login-box">
-      <h1>Coding</h1>
-      <input type="text" id="username" placeholder="Username" autocomplete="username"/>
-      <input type="password" id="password" placeholder="Password" autocomplete="current-password"/>
-      <button onclick="login()">Login</button>
-      <p id="error" style="color: #f87171; text-align:center;"></p>
-    </div>
-
-    <div id="student-box" class="hidden">
-      <h1>Welcome, <span id="student-name"></span></h1>
-      <p>Class every Monday at 8:30 PM 🇱🇧 / 6:30 PM 🇬🇧</p>
-      <button onclick="joinZoom()">Join Zoom</button>
-      <div class="log-box" id="student-log"></div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-
-    <div id="admin-box" class="hidden">
-      <h1>Admin Panel</h1>
-      <button onclick="joinZoom()">Join Zoom</button>
-      <div class="log-box" id="admin-log">
-        Attendance is saved directly in your Google Sheet.
-      </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
+<div id="container">
+  <div id="login">
+    <h2>Login to Coding Class</h2>
+    <input type="text" id="username" placeholder="Username" autocomplete="username" />
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password" />
+    <button onclick="login()">Login</button>
+    <div id="error"></div>
   </div>
 
-  <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwh8q9QiQmcplsG0UkHOWQHcretZ90F_senZMzksCPr0bzUWmRPZGK8BWvivCtDZuqG/execc";
-    let zoomLink = "";
+  <div id="dashboard">
+    <h2>Welcome, <span id="user-name"></span></h2>
+    <p>Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</p>
+    <button onclick="joinZoom()">Join Zoom</button>
+    <button onclick="logout()" style="margin-top: 15px; background:#f44;">Logout</button>
+    <p id="log" style="margin-top: 15px; font-size: 14px;"></p>
+  </div>
+</div>
 
-    function login() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorElem = document.getElementById("error");
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlRFteXuXiZipGJl1bk7gR-YMOcjozPCts9WkKcjINE8gz9TazDfq7lWUYvjMNpxtn/exec";
 
-      if (!username || !password) {
-        errorElem.textContent = "Please enter both fields.";
-        return;
-      }
+let zoomLink = "";
+let currentUser = "";
+let currentPassword = "";
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          zoomLink = data.zoomLink;
-          errorElem.textContent = "";
-          window.localStorage.setItem('username', username);
-          window.localStorage.setItem('password', password);
+function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorDiv = document.getElementById('error');
+  errorDiv.textContent = '';
 
-          document.getElementById("login-box").classList.add("hidden");
+  if (!username || !password) {
+    errorDiv.textContent = 'Please enter username and password.';
+    return;
+  }
 
-          if (data.role === "student") {
-            document.getElementById("student-box").classList.remove("hidden");
-            document.getElementById("student-name").textContent = username;
-            const now = new Date().toLocaleString();
-            document.getElementById("student-log").innerHTML = `Attendance logged at: <strong>${now}</strong>`;
-          } else if (data.role === "admin") {
-            document.getElementById("admin-box").classList.remove("hidden");
-          }
-        } else {
-          errorElem.textContent = data.error || "Login failed.";
-        }
-      })
-      .catch(err => {
-        errorElem.textContent = "Error connecting to server.";
-        console.error(err);
-      });
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      zoomLink = data.zoomLink;
+      currentUser = username;
+      currentPassword = password;
+      showDashboard(username, data.role);
+    } else {
+      errorDiv.textContent = data.error || 'Login failed.';
     }
+  })
+  .catch(() => {
+    errorDiv.textContent = 'Cannot connect to server.';
+  });
+}
 
-    function joinZoom() {
-      if (!zoomLink) {
-        alert("Zoom link not available.");
-        return;
-      }
+function showDashboard(username, role) {
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('user-name').textContent = username;
 
-      const username = window.localStorage.getItem('username') || "";
-      const password = window.localStorage.getItem('password') || "";
+  if (role === 'admin') {
+    document.querySelector('button[onclick="joinZoom()"]').style.display = 'none';
+  }
+  document.getElementById('log').textContent = `Logged in at ${new Date().toLocaleString()}`;
+}
 
-      if (!username || !password) {
-        alert("You must be logged in.");
-        logout();
-        return;
-      }
+function joinZoom() {
+  if (!zoomLink) {
+    alert('Zoom link not available.');
+    return;
+  }
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-          joinClick: true
-        })
-      }).then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            window.open(zoomLink, "_blank");
-          } else {
-            alert("Error saving join log: " + data.error);
-          }
-        }).catch(err => {
-          console.error("Join click error:", err);
-          alert("Failed to connect to server.");
-        });
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: currentUser,
+      password: currentPassword,
+      joinClick: true
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      window.open(zoomLink, '_blank');
+      document.getElementById('log').textContent = `Joined Zoom at ${new Date().toLocaleString()}`;
+    } else {
+      alert('Error: ' + data.error);
     }
+  })
+  .catch(() => alert('Failed to connect to server.'));
+}
 
-    function logout() {
-      window.localStorage.removeItem('username');
-      window.localStorage.removeItem('password');
+function logout() {
+  currentUser = '';
+  currentPassword = '';
+  zoomLink = '';
+  document.getElementById('login').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('error').textContent = '';
+}
+</script>
 
-      document.getElementById("login-box").classList.remove("hidden");
-      document.getElementById("student-box").classList.add("hidden");
-      document.getElementById("admin-box").classList.add("hidden");
-      document.getElementById("username").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("error").textContent = "";
-    }
-  </script>
 </body>
 </html>
