@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Test Attendance Logging</h2>
+    <button onclick="markAttendance()">Mark Attendance for Joel</button>
+
+    <script>
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxdk35G4i5ISgYiYx8UAd7rEIPM7xeBy-l1rdip529wXX5W6hhvTw9C3evdf-8ppOp-/exec";
+
+      function markAttendance() {
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: "joel" })
+        })
+        .then(res => res.text())
+        .then(data => alert("Response: " + data))
+        .catch(err => alert("Error: " + err));
+      }
+    </script>
+  </body>
+</html>
