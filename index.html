@@ -1,23 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Join Coding Class</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coding Class Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      padding: 40px;
+      max-width: 500px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      color: #1e3a8a;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      border: none;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .hidden {
+      display: none;
+    }
+    .log {
+      margin-top: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Coding Class Attendance</h2>
-  <form action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse" method="POST" target="_blank" onsubmit="markTime()">
-    <label>Username:</label><br>
-    <input type="text" name="entry.274009332" required><br><br>
-    
-    <input type="submit" value="Join Zoom & Mark Attendance">
-  </form>
+
+  <h2>Coding Class Login</h2>
+
+  <div id="login-box">
+    <input type="text" id="username" placeholder="Username (e.g. joel)" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <div id="error-msg" style="color: red; margin-top: 10px;"></div>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <h2>Welcome, <span id="student-name"></span></h2>
+    <p>Class every Monday - 8:30 PM Lebanon / 6:30 PM UK</p>
+
+    <form
+      id="attendance-form"
+      action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"
+      method="POST"
+      target="_blank"
+      onsubmit="openZoom();"
+    >
+      <input type="hidden" name="entry.274009332" id="form-name" />
+      <button type="submit">Join Zoom & Mark Attendance</button>
+    </form>
+
+    <div class="log" id="log"></div>
+    <button onclick="logout()" style="background:#e11d48; margin-top:20px;">Logout</button>
+  </div>
 
   <script>
-    function markTime() {
+    const users = {
+      joel: "joel123",
+      ali: "ali456",
+      sara: "sara789"
+    };
+
+    let currentUser = "";
+
+    function login() {
+      const user = document.getElementById("username").value.trim().toLowerCase();
+      const pass = document.getElementById("password").value.trim();
+      const error = document.getElementById("error-msg");
+
+      if (users[user] && users[user] === pass) {
+        currentUser = user;
+        document.getElementById("login-box").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("student-name").textContent = user;
+        document.getElementById("form-name").value = user;
+        error.textContent = "";
+      } else {
+        error.textContent = "Incorrect username or password.";
+      }
+    }
+
+    function logout() {
+      currentUser = "";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("login-box").classList.remove("hidden");
+      document.getElementById("log").innerHTML = "";
+    }
+
+    function openZoom() {
       setTimeout(() => {
+        const now = new Date().toLocaleString();
+        document.getElementById("log").innerHTML =
+          `<p><strong>${currentUser}</strong> joined at ${now}</p>` +
+          document.getElementById("log").innerHTML;
+
         window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
       }, 500);
     }
   </script>
+
 </body>
 </html>
