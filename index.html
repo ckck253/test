@@ -2,129 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coding Class Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coding Class Portal</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-      padding: 40px;
-      max-width: 500px;
-      margin: auto;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
-    h2 {
+    .container {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+    h1 {
       text-align: center;
-      color: #1e3a8a;
+      color: #38bdf8;
     }
     input, button {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
+      border: none;
       border-radius: 6px;
-      font-size: 16px;
-      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    input {
+      background: #334155;
+      color: white;
     }
     button {
-      background-color: #2563eb;
+      background-color: #0ea5e9;
       color: white;
+      cursor: pointer;
       font-weight: bold;
-      border: none;
     }
     button:hover {
-      background-color: #1d4ed8;
+      background-color: #0284c7;
     }
     .hidden {
       display: none;
     }
-    .log {
-      margin-top: 20px;
-      background: white;
+    .log-box {
+      background: #0f172a;
+      border: 1px solid #334155;
       padding: 10px;
-      border-radius: 6px;
-      font-size: 14px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .logout-btn {
+      background: #ef4444;
     }
   </style>
 </head>
 <body>
 
-  <h2>Coding Class Login</h2>
+  <div class="container">
+    <div id="login-box">
+      <h1>Coding Class</h1>
+      <input type="text" id="username" placeholder="Username"/>
+      <input type="password" id="password" placeholder="Password"/>
+      <button onclick="login()">Login</button>
+      <p id="error" style="color: #f87171; text-align:center;"></p>
+    </div>
 
-  <div id="login-box">
-    <input type="text" id="username" placeholder="Username (e.g. joel)" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <div id="error-msg" style="color: red; margin-top: 10px;"></div>
+    <div id="student-box" class="hidden">
+      <h1>Welcome, <span id="student-name"></span></h1>
+      <p>Class every Monday at 8:30 PM 🇱🇧 / 6:30 PM 🇬🇧</p>
+      <button onclick="joinZoom()">Join Zoom</button>
+      <div class="log-box" id="student-log"></div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="admin-box" class="hidden">
+      <h1>Admin Panel</h1>
+      <button onclick="joinZoom()">Join Zoom</button>
+      <div class="log-box" id="admin-log">
+        Attendance is saved directly in your Google Sheet.
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
   </div>
-
-  <div id="dashboard" class="hidden">
-    <h2>Welcome, <span id="student-name"></span></h2>
-    <p>Class every Monday - 8:30 PM Lebanon / 6:30 PM UK</p>
-
-    <button onclick="joinZoom()">Join Zoom Class</button>
-    <div class="log" id="log"></div>
-    <button onclick="logout()" style="background:#e11d48; margin-top:20px;">Logout</button>
-  </div>
-
-  <!-- hidden attendance form -->
-  <form
-    id="attendance-form"
-    action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"
-    method="POST"
-    target="dummyFrame"
-    style="display:none;"
-  >
-    <input type="hidden" name="entry.523271273" id="form-name" />
-  </form>
-
-  <iframe name="dummyFrame" style="display:none;"></iframe>
 
   <script>
-    const users = {
-      joel: "joel123",
-      ali: "ali456",
-      sara: "sara789"
-    };
-
-    let currentUser = "";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby0bbccWl0dOKbE0LAelKXg21-uCFvDpjYxSQs0kwybF1Jx0dhRJSq3YdCMxbbKloKm/exec";
+    let zoomLink = "";
 
     function login() {
-      const user = document.getElementById("username").value.trim().toLowerCase();
-      const pass = document.getElementById("password").value.trim();
-      const error = document.getElementById("error-msg");
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorElem = document.getElementById("error");
 
-      if (users[user] && users[user] === pass) {
-        currentUser = user;
-        document.getElementById("login-box").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-        document.getElementById("student-name").textContent = user;
-
-        // Auto-fill and submit attendance form
-        document.getElementById("form-name").value = user;
-        document.getElementById("attendance-form").submit();
-
-        const now = new Date().toLocaleString();
-        document.getElementById("log").innerHTML =
-          `<p><strong>${user}</strong> attendance logged at ${now}</p>`;
-
-        error.textContent = "";
-      } else {
-        error.textContent = "Incorrect username or password.";
+      if (!username || !password) {
+        errorElem.textContent = "Please enter both fields.";
+        return;
       }
+
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        contentType: "application/json",
+        body: JSON.stringify({ username, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          zoomLink = data.zoomLink;
+          errorElem.textContent = "";
+          document.getElementById("login-box").classList.add("hidden");
+
+          if (data.role === "student") {
+            document.getElementById("student-box").classList.remove("hidden");
+            document.getElementById("student-name").textContent = username;
+            const now = new Date().toLocaleString();
+            document.getElementById("student-log").innerHTML = `Attendance logged at: <strong>${now}</strong>`;
+          } else if (data.role === "admin") {
+            document.getElementById("admin-box").classList.remove("hidden");
+          }
+        } else {
+          errorElem.textContent = data.error || "Login failed.";
+        }
+      })
+      .catch(err => {
+        errorElem.textContent = "Error connecting to server.";
+        console.error(err);
+      });
     }
 
     function joinZoom() {
-      window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
+      if (zoomLink) {
+        window.open(zoomLink, "_blank");
+      } else {
+        alert("Zoom link not available.");
+      }
     }
 
     function logout() {
-      currentUser = "";
+      document.getElementById("login-box").classList.remove("hidden");
+      document.getElementById("student-box").classList.add("hidden");
+      document.getElementById("admin-box").classList.add("hidden");
       document.getElementById("username").value = "";
       document.getElementById("password").value = "";
-      document.getElementById("dashboard").classList.add("hidden");
-      document.getElementById("login-box").classList.remove("hidden");
-      document.getElementById("log").innerHTML = "";
+      document.getElementById("error").textContent = "";
     }
   </script>
-
 </body>
 </html>
