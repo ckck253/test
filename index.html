@@ -1,157 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
+  <title>Join Coding Class</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coding Class Attendance</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #eef2f7;
-      margin: 0;
-      padding: 20px;
-      max-width: 480px;
-      margin-left: auto;
-      margin-right: auto;
+      font-family: Arial;
+      background: #f4f4f4;
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
     }
-    h2 { color: #333; }
     input, button {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
+      border-radius: 5px;
+      font-size: 16px;
     }
     button {
-      background-color: #3478f6;
+      background: #2d89ef;
       color: white;
       border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background-color: #2a62c4;
     }
     .hidden { display: none; }
-    .error { color: red; margin-top: 10px; }
-    .log {
-      background: white;
-      padding: 10px;
-      margin-top: 15px;
-      border-radius: 6px;
-      max-height: 200px;
-      overflow-y: auto;
-      font-size: 0.9rem;
-    }
-    a { color: #3478f6; text-decoration: none; }
+    .log { margin-top: 20px; background: white; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
 
-<div id="login-box">
-  <h2>Login to Coding Class</h2>
-  <input type="text" id="username" placeholder="Username" autocomplete="off" />
-  <input type="password" id="password" placeholder="Password" autocomplete="off" />
+<h2>Coding Class Login</h2>
+
+<div id="login">
+  <input type="text" id="username" placeholder="Username (e.g. joel)">
+  <input type="password" id="password" placeholder="Password">
   <button onclick="login()">Login</button>
-  <p id="error-msg" class="error"></p>
+  <div id="login-error" style="color: red;"></div>
 </div>
 
-<div id="student-box" class="hidden">
-  <h2>Welcome, <span id="student-name"></span></h2>
-  <p>Class every Monday 8:30 PM Lebanon (6:30 PM UK)</p>
-  <button onclick="joinClass()">Join Zoom & Mark Attendance</button>
-  <button onclick="logout()" style="background:#d9534f; margin-top:15px;">Logout</button>
-  <div id="log" class="log"></div>
-</div>
-
-<div id="admin-box" class="hidden">
-  <h2>Teacher Dashboard</h2>
-  <p><strong>Attendance Sheet:</strong>
-    <a href="https://docs.google.com/spreadsheets/d/1bCqfbQB5esLYpYP7NBZKYDYP6xBsOdhhh-NUK9ORDNA/edit" target="_blank">
-      Open Google Sheet
-    </a>
-  </p>
-  <button onclick="logout()" style="background:#d9534f; margin-top:15px;">Logout</button>
+<div id="student" class="hidden">
+  <p>Welcome <span id="student-name"></span>!</p>
+  <button onclick="joinZoom()">Join Zoom & Submit Attendance</button>
+  <div class="log" id="log"></div>
 </div>
 
 <script>
-  // ✅ CONFIGURATION
-  const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1";
-  const GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse";
+const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse";
+const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1";
+const ENTRY_NAME = "entry.274009332";
 
-  // These are your form field entry IDs
-  const FORM_ENTRY_NAME = "entry.274009332";
+const users = {
+  joel: "joel123",
+  ali: "ali456",
+  sara: "sara789"
+};
 
-  // Student login credentials
-  const students = {
-    "joel": "joel123",
-    "ali": "ali456",
-    "sara": "sara789"
-  };
+let loggedIn = "";
 
-  // Admin credentials
-  const admin = {
-    username: "mrkhalil2121@gmail.com",
-    password: "admin123"
-  };
+function login() {
+  const u = document.getElementById("username").value.trim().toLowerCase();
+  const p = document.getElementById("password").value.trim();
+  const err = document.getElementById("login-error");
 
-  let loggedInUser = "";
-
-  function login() {
-    const u = document.getElementById("username").value.trim().toLowerCase();
-    const p = document.getElementById("password").value.trim();
-    const errorMsg = document.getElementById("error-msg");
-    errorMsg.textContent = "";
-
-    if (u === admin.username.toLowerCase() && p === admin.password) {
-      loggedInUser = admin.username;
-      document.getElementById("login-box").classList.add("hidden");
-      document.getElementById("admin-box").classList.remove("hidden");
-      return;
-    }
-
-    if (students[u] && students[u] === p) {
-      loggedInUser = u;
-      document.getElementById("student-name").textContent = u;
-      document.getElementById("login-box").classList.add("hidden");
-      document.getElementById("student-box").classList.remove("hidden");
-      return;
-    }
-
-    errorMsg.textContent = "Invalid username or password.";
+  if (users[u] && users[u] === p) {
+    loggedIn = u;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("student").classList.remove("hidden");
+    document.getElementById("student-name").textContent = u;
+    err.textContent = "";
+  } else {
+    err.textContent = "Wrong username or password.";
   }
+}
 
-  function logout() {
-    loggedInUser = "";
-    document.getElementById("login-box").classList.remove("hidden");
-    document.getElementById("student-box").classList.add("hidden");
-    document.getElementById("admin-box").classList.add("hidden");
-    document.getElementById("error-msg").textContent = "";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("log").innerHTML = "";
-  }
+function joinZoom() {
+  if (!loggedIn) return;
 
-  function joinClass() {
-    if (!loggedInUser) return alert("Please login first.");
+  const data = new URLSearchParams();
+  data.append(ENTRY_NAME, loggedIn);
 
-    const formData = new FormData();
-    formData.append(FORM_ENTRY_NAME, loggedInUser);
-
-    fetch(GOOGLE_FORM_ACTION, {
-      method: "POST",
-      mode: "no-cors",
-      body: formData
-    })
-    .then(() => {
-      const log = document.getElementById("log");
-      const nowStr = new Date().toLocaleString();
-      log.innerHTML = `<div>${loggedInUser} joined at ${nowStr}</div>` + log.innerHTML;
-      window.open(ZOOM_LINK, "_blank");
-    })
-    .catch(err => alert("Failed to mark attendance: " + err));
-  }
+  fetch(GOOGLE_FORM_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: data
+  }).then(() => {
+    const now = new Date().toLocaleString();
+    document.getElementById("log").innerHTML = `Attendance marked for ${loggedIn} at ${now}`;
+    window.open(ZOOM_LINK, "_blank");
+  }).catch(() => {
+    alert("Failed to mark attendance.");
+  });
+}
 </script>
 
 </body>
