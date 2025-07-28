@@ -1,43 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Coding Class Attendance</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #eef2f7;
-    margin: 0;
-    padding: 20px;
-    max-width: 480px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  h2 { color: #333; }
-  input, button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-  }
-  button {
-    background-color: #3478f6;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  button:hover {
-    background-color: #2a62c4;
-  }
-  .hidden { display: none; }
-  .error { color: red; margin-top: 10px; }
-  .log { background: white; padding: 10px; margin-top: 15px; border-radius: 6px; max-height: 200px; overflow-y: auto; font-size: 0.9rem; }
-  a { color: #3478f6; text-decoration: none; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coding Class Attendance</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      margin: 0;
+      padding: 20px;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h2 { color: #333; }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #3478f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #2a62c4;
+    }
+    .hidden { display: none; }
+    .error { color: red; margin-top: 10px; }
+    .log {
+      background: white;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+    a { color: #3478f6; text-decoration: none; }
+  </style>
 </head>
 <body>
 
@@ -59,47 +67,50 @@
 
 <div id="admin-box" class="hidden">
   <h2>Teacher Dashboard</h2>
-  <p><strong>Attendance Sheet:</strong> <a href="https://docs.google.com/spreadsheets/d/1bCqfbQB5esLYpYP7NBZKYDYP6xBsOdhhh-NUK9ORDNA/edit" target="_blank">Open Google Sheet</a></p>
+  <p><strong>Attendance Sheet:</strong>
+    <a href="https://docs.google.com/spreadsheets/d/1bCqfbQB5esLYpYP7NBZKYDYP6xBsOdhhh-NUK9ORDNA/edit" target="_blank">
+      Open Google Sheet
+    </a>
+  </p>
   <button onclick="logout()" style="background:#d9534f; margin-top:15px;">Logout</button>
 </div>
 
 <script>
-  // === CHANGE THESE BEFORE USE ===
-  const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1"; // Your Zoom link
-  const GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"; // Your Google Form POST URL
-  
-  // Your actual form entry IDs
-  const FORM_ENTRY_NAME = "entry.274009332"; 
-  const FORM_ENTRY_DATE = "entry.1723737670"; 
-  
-  // USERS - replace/add your students here
+  // ✅ CONFIGURATION
+  const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1";
+  const GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse";
+
+  // These are your form field entry IDs
+  const FORM_ENTRY_NAME = "entry.274009332";
+
+  // Student login credentials
   const students = {
     "joel": "joel123",
     "ali": "ali456",
     "sara": "sara789"
   };
-  
+
   // Admin credentials
   const admin = {
     username: "mrkhalil2121@gmail.com",
     password: "admin123"
   };
-  
+
   let loggedInUser = "";
-  
+
   function login() {
     const u = document.getElementById("username").value.trim().toLowerCase();
     const p = document.getElementById("password").value.trim();
     const errorMsg = document.getElementById("error-msg");
     errorMsg.textContent = "";
-    
+
     if (u === admin.username.toLowerCase() && p === admin.password) {
-      showAdmin();
       loggedInUser = admin.username;
       document.getElementById("login-box").classList.add("hidden");
+      document.getElementById("admin-box").classList.remove("hidden");
       return;
     }
-    
+
     if (students[u] && students[u] === p) {
       loggedInUser = u;
       document.getElementById("student-name").textContent = u;
@@ -107,10 +118,10 @@
       document.getElementById("student-box").classList.remove("hidden");
       return;
     }
-    
+
     errorMsg.textContent = "Invalid username or password.";
   }
-  
+
   function logout() {
     loggedInUser = "";
     document.getElementById("login-box").classList.remove("hidden");
@@ -121,18 +132,13 @@
     document.getElementById("password").value = "";
     document.getElementById("log").innerHTML = "";
   }
-  
-  function showAdmin() {
-    document.getElementById("admin-box").classList.remove("hidden");
-  }
-  
+
   function joinClass() {
     if (!loggedInUser) return alert("Please login first.");
-    
+
     const formData = new FormData();
     formData.append(FORM_ENTRY_NAME, loggedInUser);
-    formData.append(FORM_ENTRY_DATE, new Date().toLocaleDateString());
-    
+
     fetch(GOOGLE_FORM_ACTION, {
       method: "POST",
       mode: "no-cors",
