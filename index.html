@@ -137,12 +137,34 @@
     }
 
     function joinZoom() {
-      if (zoomLink) {
+  if (!zoomLink) {
+    alert("Zoom link not available.");
+    return;
+  }
+
+  const username = document.getElementById("student-name").textContent || "unknown";
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    contentType: "application/json",
+    body: JSON.stringify({
+      username: username,
+      password: "",         // empty since we're not authenticating again
+      joinClick: true       // custom flag to log Join action
+    })
+  }).then(res => res.json())
+    .then(data => {
+      if (data.success) {
         window.open(zoomLink, "_blank");
       } else {
-        alert("Zoom link not available.");
+        alert("Error saving join log: " + data.error);
       }
-    }
+    }).catch(err => {
+      console.error("Join click error:", err);
+      alert("Failed to connect to server.");
+    });
+}
+
 
     function logout() {
       document.getElementById("login-box").classList.remove("hidden");
