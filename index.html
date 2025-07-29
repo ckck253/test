@@ -3,231 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Coding Class Login</title>
+  <title>Coding Class</title>
   <style>
     body {
+      margin: 0;
+      font-family: sans-serif;
       background: #0f172a;
       color: #cbd5e1;
-      font-family: 'Fira Code', monospace, monospace;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
-      padding: 20px;
     }
     .container {
       background: #1e293b;
-      padding: 40px;
+      padding: 30px;
       border-radius: 12px;
-      max-width: 400px;
       width: 100%;
-      box-shadow: 0 0 15px #38bdf8;
+      max-width: 480px;
+      box-shadow: 0 8px 24px rgba(100, 116, 139, 0.6);
+    }
+    h1, h2 {
       text-align: center;
+      color: #38bdf8;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
     }
     input {
       width: 100%;
-      padding: 12px;
-      margin: 15px 0;
-      border: none;
+      padding: 10px;
+      margin-top: 5px;
       border-radius: 8px;
+      border: none;
       background: #0f172a;
       color: #cbd5e1;
-      font-size: 1rem;
     }
     button {
-      background: #38bdf8;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #0f172a;
       width: 100%;
-      font-size: 1.1rem;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background: #0284c7;
-      color: #e0f2fe;
+      padding: 12px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #0ea5e9;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
     }
     #error-msg {
       color: #f87171;
-      margin-bottom: 10px;
-      font-weight: bold;
-      min-height: 20px;
-    }
-    #dashboard, #admin-panel {
-      display: none;
-      margin-top: 20px;
-      text-align: left;
-    }
-    #dashboard h2, #admin-panel h2 {
-      color: #38bdf8;
-      margin-bottom: 15px;
-    }
-    .btn-zoom {
-      background: #22c55e;
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      width: 100%;
+      text-align: center;
       margin-top: 10px;
     }
-    .btn-zoom:hover {
-      background: #16a34a;
+    #dashboard {
+      display: none;
     }
     .log {
-      margin-top: 20px;
-      max-height: 200px;
-      overflow-y: auto;
-      background: #0f172a;
+      background: #1e293b;
       padding: 10px;
+      margin-top: 20px;
       border-radius: 8px;
       font-size: 0.9rem;
-      color: #94a3b8;
-      font-family: 'Fira Code', monospace;
     }
   </style>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js"></script>
 </head>
 <body>
   <div class="container">
+    <!-- Login -->
     <div id="login-box">
-      <h1>Login to Coding Class</h1>
-      <input id="username" placeholder="Username" autocomplete="off" />
-      <input id="password" type="password" placeholder="Password" autocomplete="off" />
-      <div id="error-msg"></div>
+      <h1>Coding Class Login</h1>
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="Enter email" />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter password" />
       <button onclick="login()">Login</button>
+      <div id="error-msg"></div>
     </div>
 
+    <!-- Dashboard -->
     <div id="dashboard">
-      <h2>Welcome, <span id="user-name"></span>!</h2>
-      <p>Class every Monday 8:30 PM Lebanon / 6:30 PM UK</p>
-      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
-      <div class="log" id="attendance-log"></div>
-      <button onclick="logout()">Logout</button>
-    </div>
-
-    <div id="admin-panel">
-      <h2>Admin Panel</h2>
-      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
-      <h3>Attendance This Session</h3>
-      <div class="log" id="admin-log">No attendance yet.</div>
+      <h2>Welcome!</h2>
+      <button onclick="getZoomLink()">Join Zoom Class</button>
+      <div class="log" id="log"></div>
       <button onclick="logout()">Logout</button>
     </div>
   </div>
 
-<script>
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx9Fw915KxWGJRB37kVbwEw4Ux95b7250dXZ-O5iYbcjsUP6fC5Q6fgw0pxGsaZ_9g9/exec"; // Replace this!
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
 
-  let currentUser = null;
-  let currentRole = null;
-  let attendanceSessionLog = [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdGjGxhgSW7QzDg-5JsqF9RbkgEFNdy04",
+      authDomain: "coding-class-17c8b.firebaseapp.com",
+      projectId: "coding-class-17c8b",
+      storageBucket: "coding-class-17c8b.firebasestorage.app",
+      messagingSenderId: "37958732398",
+      appId: "1:37958732398:web:12be3400a16204892cf47f",
+      measurementId: "G-KDLVX0TDRK"
+    };
 
-  async function login() {
-    const username = document.getElementById('username').value.trim().toLowerCase();
-    const password = document.getElementById('password').value.trim();
-    const errorMsg = document.getElementById('error-msg');
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    if (!username || !password) {
-      errorMsg.textContent = "Please enter username and password";
-      return;
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("error-msg");
+
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("log").innerHTML = `<p>Logged in as <strong>${user.email}</strong></p>`;
+      } catch (error) {
+        errorMsg.textContent = "Login failed: " + error.message;
+      }
     }
 
-    try {
-      const response = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', username, password })
-      });
-      const data = await response.json();
-
-      if (data.success) {
-        currentUser = username;
-        currentRole = data.role;
-        errorMsg.textContent = "";
-        showDashboard();
-        if (currentRole === 'student') {
-          await logAttendance();
+    async function getZoomLink() {
+      try {
+        const docRef = doc(db, "settings", "zoom");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const zoomLink = docSnap.data().zoomLink;
+          window.open(zoomLink, "_blank");
+        } else {
+          alert("Zoom link not found.");
         }
-      } else {
-        errorMsg.textContent = data.error || "Login failed";
+      } catch (error) {
+        alert("Error fetching Zoom link: " + error.message);
       }
-    } catch (err) {
-      errorMsg.textContent = "Server error, please try again";
-      console.error(err);
     }
-  }
 
-  function showDashboard() {
-    document.getElementById('login-box').style.display = 'none';
-    if (currentRole === 'admin') {
-      document.getElementById('admin-panel').style.display = 'block';
-      updateAdminLog();
-    } else {
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('user-name').textContent = currentUser;
-    }
-  }
-
-  async function logAttendance() {
-    try {
-      const response = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'join', username: currentUser })
+    function logout() {
+      signOut(auth).then(() => {
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("login-box").style.display = "block";
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("log").innerHTML = "";
+        document.getElementById("error-msg").textContent = "";
       });
-      const data = await response.json();
-
-      if (data.success) {
-        const now = new Date().toLocaleString();
-        attendanceSessionLog.push({ username: currentUser, time: now });
-        updateAttendanceLog(now);
-      } else {
-        console.error("Attendance log failed:", data.error);
-      }
-    } catch (err) {
-      console.error("Error logging attendance:", err);
     }
-  }
-
-  function updateAttendanceLog(time) {
-    const log = document.getElementById('attendance-log');
-    log.innerHTML = `<p>You joined at ${time}</p>`;
-  }
-
-  function updateAdminLog() {
-    const adminLog = document.getElementById('admin-log');
-    if (attendanceSessionLog.length === 0) {
-      adminLog.textContent = "No attendance yet.";
-    } else {
-      adminLog.innerHTML = attendanceSessionLog
-        .map(entry => `<p><strong>${entry.username}</strong> joined at ${entry.time}</p>`)
-        .join('');
-    }
-  }
-
-  function joinZoom() {
-    const zoomLink = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1"; // Replace with your Zoom link
-    window.open(zoomLink, "_blank");
-  }
-
-  function logout() {
-    currentUser = null;
-    currentRole = null;
-    attendanceSessionLog = [];
-    document.getElementById('login-box').style.display = 'block';
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('admin-panel').style.display = 'none';
-    document.getElementById('username').value = "";
-    document.getElementById('password').value = "";
-    document.getElementById('error-msg').textContent = "";
-    document.getElementById('attendance-log').innerHTML = "";
-    document.getElementById('admin-log').innerHTML = "";
-  }
-</script>
+  </script>
 </body>
 </html>
