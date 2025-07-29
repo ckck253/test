@@ -1,88 +1,222 @@
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-
-<script>
-  // ✅ Firebase Config — replace with your actual values
-  const firebaseConfig = {
-    apiKey: "AIzaSyD3EXAMPLEKEY1234567890",
-    authDomain: "coding-class.firebaseapp.com",
-    projectId: "coding-class",
-    appId: "1:1234567890:web:abcdef123456"
-  };
-
-  // ✅ Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  let currentUser = "";
-  let currentRole = "";
-
-  function login() {
-    const userInput = document.getElementById("username").value.trim().toLowerCase();
-    const passInput = document.getElementById("password").value.trim();
-    const errorMsg = document.getElementById("error-msg");
-
-    if (!userInput || !passInput) {
-      errorMsg.textContent = "Please enter both username and password.";
-      return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coding Class</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #cbd5e1;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
+    .container {
+      background: #0f172a;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(100, 116, 139, 0.6);
+      max-width: 480px;
+      width: 100%;
+    }
+    h1, h2 {
+      font-family: 'Fira Code', monospace;
+      text-align: center;
+      color: #38bdf8;
+      margin-bottom: 1rem;
+      user-select: none;
+      text-shadow: 0 0 5px #38bdf8;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-family: 'Fira Code', monospace;
+      background: #1e293b;
+      color: #cbd5e1;
+      box-shadow: inset 0 0 8px #0f172a;
+      transition: box-shadow 0.3s ease;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      box-shadow: 0 0 12px #38bdf8;
+      background: #152238;
+    }
+    button {
+      width: 100%;
+      padding: 14px 0;
+      border: none;
+      border-radius: 10px;
+      background: #0ea5e9;
+      color: #0f172a;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      font-family: 'Fira Code', monospace;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      box-shadow: 0 4px 12px #38bdf8aa;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background: #0284c7;
+      color: #e0f2fe;
+    }
+    #error-msg {
+      color: #f87171;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 700;
+      user-select: none;
+    }
+    #dashboard, #admin-panel {
+      display: none;
+    }
+    .welcome {
+      text-align: center;
+      font-family: 'Fira Code', monospace;
+      margin-bottom: 25px;
+      color: #38bdf8;
+      font-size: 1.4rem;
+      text-shadow: 0 0 10px #0ea5e9;
+      user-select: none;
+    }
+    .info {
+      text-align: center;
+      font-style: italic;
+      color: #64748b;
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+    .log {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 10px;
+      user-select: text;
+    }
+    .btn-logout {
+      background: #ef4444;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      box-shadow: 0 4px 12px #f87171aa;
+    }
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+    .btn-zoom {
+      background: #22c55e;
+      box-shadow: 0 4px 12px #22c55eaa;
+    }
+    .btn-zoom:hover {
+      background: #16a34a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="login-box">
+      <h1>Welcome to Coding Class</h1>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="off" />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="off" />
+      <button onclick="login()">Login</button>
+      <div id="error-msg"></div>
+    </div>
 
-    const email = `${userInput}@classroom.local`;
+    <div id="dashboard">
+      <div class="welcome">Hello, <span id="student-name"></span>!</div>
+      <div class="info">Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</div>
+      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+      <div class="log" id="log"></div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
 
-    errorMsg.textContent = "Logging in...";
+    <div id="admin-panel">
+      <h2>Admin Panel</h2>
+      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+      <div class="info" style="margin-top: 10px;">Attendance log (students logged in this session):</div>
+      <div class="log" id="admin-log"></div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
 
-    auth.signInWithEmailAndPassword(email, passInput)
-      .then(() => {
-        currentUser = userInput;
-        currentRole = userInput === "teacher" ? "admin" : "student";
-        errorMsg.textContent = "";
-        document.getElementById("login-box").style.display = "none";
+    <form
+      id="attendance-form"
+      action="https://docs.google.com/forms/d/e/1FAIpQLScxFMIL7IVDoCg7kOKt1dtq0W2VQzd4WuxKL5PL8_Wbf9T3rw/formResponse"
+      method="POST"
+      target="dummyFrame"
+      style="display:none;"
+    >
+      <input type="hidden" name="entry.523271273" id="form-name" />
+    </form>
+    <iframe name="dummyFrame" style="display:none;"></iframe>
+  </div>
 
-        if (currentRole === "student") {
-          showStudentDashboard();
-        } else {
-          showAdminPanel();
-        }
-      })
-      .catch((error) => {
-        errorMsg.textContent = "Login failed: " + error.message;
-      });
-  }
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"></script>
 
-  function showStudentDashboard() {
-    document.getElementById("dashboard").style.display = "block";
-    document.getElementById("student-name").textContent = currentUser;
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdGjGxhgSW7QzDg-5JsqF9RbkgEFNdy04",
+      authDomain: "coding-class-17c8b.firebaseapp.com",
+      projectId: "coding-class-17c8b",
+      storageBucket: "coding-class-17c8b.firebasestorage.app",
+      messagingSenderId: "37958732398",
+      appId: "1:37958732398:web:12be3400a16204892cf47f",
+      measurementId: "G-KDLVX0TDRK"
+    };
 
-    document.getElementById("form-name").value = currentUser;
-    document.getElementById("attendance-form").submit();
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const analytics = firebase.analytics();
 
-    const now = new Date().toLocaleString();
-    const logElem = document.getElementById("log");
-    logElem.innerHTML = `<p><strong>${currentUser}</strong> attendance logged at ${now}</p>`;
-  }
+    let currentUser = "";
+    let currentRole = "";
 
-  function showAdminPanel() {
-    document.getElementById("admin-panel").style.display = "block";
-    document.getElementById("admin-log").innerHTML = "<p>Attendance log not available in Firebase version.</p>";
-  }
+    function login() {
+      const userInput = document.getElementById("username").value.trim().toLowerCase();
+      const passInput = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("error-msg");
 
-  function joinZoom() {
-    window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
-  }
+      if (!userInput || !passInput) {
+        errorMsg.textContent = "Please enter both username and password.";
+        return;
+      }
 
-  function logout() {
-    auth.signOut().then(() => {
-      currentUser = "";
-      currentRole = "";
-      document.getElementById("username").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("admin-panel").style.display = "none";
-      document.getElementById("login-box").style.display = "block";
-      document.getElementById("log").innerHTML = "";
-      document.getElementById("admin-log").innerHTML = "";
-      document.getElementById("error-msg").textContent = "";
-    });
-  }
-</script>
+      const email = `${userInput}@classroom.local`;
+
+      errorMsg.textContent = "Logging in...";
+
+      auth.signInWithEmailAndPassword(email, passInput)
+        .then(() => {
+          currentUser = userInput;
+          currentRole = user
