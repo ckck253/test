@@ -1,179 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Coding Class</title>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet"/>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: 'Fira Code', monospace;
-      background: linear-gradient(to right, #0f172a, #1e293b);
-      color: #e2e8f0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #cbd5e1;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 20px;
     }
+
     .container {
-      background: #1e293b;
-      padding: 30px;
+      background: #0f172a;
+      padding: 30px 40px;
       border-radius: 12px;
-      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(100, 116, 139, 0.6);
+      max-width: 480px;
       width: 100%;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
-    h1 {
+
+    h1, h2 {
+      font-family: 'Fira Code', monospace;
       text-align: center;
       color: #38bdf8;
+      margin-bottom: 1rem;
+      user-select: none;
+      text-shadow: 0 0 5px #38bdf8;
     }
+
     label {
       display: block;
-      margin-top: 15px;
-      color: #cbd5e1;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #94a3b8;
     }
-    input {
+
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      border-radius: 8px;
       border: none;
-      background: #0f172a;
-      color: #e2e8f0;
+      font-size: 1rem;
+      font-family: 'Fira Code', monospace;
+      background: #1e293b;
+      color: #cbd5e1;
+      box-shadow: inset 0 0 8px #0f172a;
+      transition: box-shadow 0.3s ease;
     }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+      outline: none;
+      box-shadow: 0 0 12px #38bdf8;
+      background: #152238;
+    }
+
     button {
       width: 100%;
-      padding: 12px;
-      margin-top: 20px;
+      padding: 14px 0;
       border: none;
-      border-radius: 8px;
-      background-color: #0ea5e9;
-      color: white;
-      font-weight: bold;
+      border-radius: 10px;
+      background: #0ea5e9;
+      color: #0f172a;
+      font-size: 1.1rem;
+      font-weight: 700;
       cursor: pointer;
+      letter-spacing: 0.05em;
+      font-family: 'Fira Code', monospace;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      box-shadow: 0 4px 12px #38bdf8aa;
+      margin-bottom: 10px;
     }
-    .hidden { display: none; }
-    .log-box {
-      margin-top: 20px;
-      background: #0f172a;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 0.9em;
+
+    button:hover {
+      background: #0284c7;
+      color: #e0f2fe;
     }
-    .logout-btn {
-      margin-top: 20px;
+
+    #error-msg {
+      color: #f87171;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 700;
+      user-select: none;
+    }
+
+    #dashboard, #admin-panel {
+      display: none;
+    }
+
+    .welcome {
+      text-align: center;
+      font-family: 'Fira Code', monospace;
+      margin-bottom: 25px;
+      color: #38bdf8;
+      font-size: 1.4rem;
+      text-shadow: 0 0 10px #0ea5e9;
+      user-select: none;
+    }
+
+    .info {
+      text-align: center;
+      font-style: italic;
+      color: #64748b;
+      margin-bottom: 30px;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+
+    .log {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 15px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 10px;
+      user-select: text;
+    }
+
+    .btn-logout {
       background: #ef4444;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      box-shadow: 0 4px 12px #f87171aa;
+    }
+
+    .btn-logout:hover {
+      background: #dc2626;
+    }
+
+    .btn-zoom {
+      background: #22c55e;
+      box-shadow: 0 4px 12px #22c55eaa;
+    }
+
+    .btn-zoom:hover {
+      background: #16a34a;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <h1>Coding Class</h1>
 
+    <!-- LOGIN BOX -->
     <div id="login-box">
-      <label>Username</label>
-      <input type="text" id="username" placeholder="e.g. joel" />
-      <label>Password</label>
-      <input type="password" id="password" placeholder="e.g. joel123" />
+      <h1>Welcome to Coding Class</h1>
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter your username" autocomplete="off" />
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter your password" autocomplete="off" />
       <button onclick="login()">Login</button>
-      <div id="login-error" style="color:#f87171; margin-top:10px;"></div>
+      <div id="error-msg"></div>
     </div>
 
-    <div id="student-panel" class="hidden">
-      <p>Welcome, <span id="student-name"></span>!</p>
-      <p>Next class: Monday 8:30 PM Lebanon / 6:30 PM UK</p>
-      <button onclick="joinClass()">Join Zoom</button>
-      <div class="log-box" id="student-log"></div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- STUDENT DASHBOARD -->
+    <div id="dashboard">
+      <div class="welcome">Hello, <span id="student-name"></span>!</div>
+      <div class="info">Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</div>
+      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+      <div class="log" id="log"></div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 
-    <div id="admin-panel" class="hidden">
-      <p>Welcome Admin!</p>
-      <button onclick="joinClass()">Join Zoom</button>
-      <div class="log-box" id="admin-log">Attendance log will show here.</div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+    <!-- ADMIN PANEL -->
+    <div id="admin-panel">
+      <h2>Admin Panel</h2>
+      <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+      <div class="info" style="margin-top: 10px;">Attendance log (students logged in this session):</div>
+      <div class="log" id="admin-log">
+        <!-- attendance logs go here -->
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
+
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygpP_uHpgngchg0qH5nfdnqTvPea4K3n6NWHk06GtrXEKb9vPxMXOYMp_0MO1JZOeB/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzxna-0poPmccJ1jqi6_md-_I530uxLlucLfDw93jCo1rvmcE5EbqUwkuTMN6ClZkf9/exec";
+
+    // Zoom link kept only inside JS (not visible in page source easily)
+    const ZOOM_LINK = "https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1";
 
     let currentUser = "";
     let currentRole = "";
 
-    function login() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const errorBox = document.getElementById("login-error");
+    // Session attendance log for admin view
+    let attendanceLog = [];
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify({ username, password, action: "login" }),
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(res => res.json())
-      .then(data => {
+    async function login() {
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      const password = document.getElementById("password").value.trim();
+      const errorMsg = document.getElementById("error-msg");
+
+      if (!username || !password) {
+        errorMsg.textContent = "Please enter username and password.";
+        return;
+      }
+
+      errorMsg.textContent = "Logging in...";
+
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "login",
+            username: username,
+            password: password
+          }),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await response.json();
+
         if (data.success) {
           currentUser = username;
           currentRole = data.role;
+          errorMsg.textContent = "";
+          document.getElementById("login-box").style.display = "none";
 
-          document.getElementById("login-box").classList.add("hidden");
           if (currentRole === "student") {
-            document.getElementById("student-name").textContent = username;
-            document.getElementById("student-panel").classList.remove("hidden");
+            showStudentDashboard();
           } else if (currentRole === "admin") {
-            document.getElementById("admin-panel").classList.remove("hidden");
+            showAdminPanel();
           }
         } else {
-          errorBox.textContent = data.error || "Login failed";
+          errorMsg.textContent = data.error || "Login failed.";
         }
-      })
-      .catch(err => {
-        errorBox.textContent = "Server error";
-      });
+      } catch (err) {
+        errorMsg.textContent = "Server error. Try again.";
+      }
     }
 
-    function joinClass() {
-      if (!currentUser) return;
+    async function showStudentDashboard() {
+      document.getElementById("dashboard").style.display = "block";
+      document.getElementById("student-name").textContent = currentUser;
 
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify({ username: currentUser, password: "", action: "join" }),
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(res => res.json())
-      .then(data => {
+      // Mark attendance on server
+      try {
+        const response = await fetch(WEB_APP_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "join",
+            username: currentUser
+          }),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        const data = await response.json();
+
+        const logElem = document.getElementById("log");
+
         if (data.success) {
-          const time = new Date().toLocaleString();
-          const logText = `${currentUser} joined at ${time}`;
+          const now = new Date().toLocaleString();
+          logElem.innerHTML = `<p><strong>${currentUser}</strong> attendance logged at ${now}</p>`;
 
-          if (currentRole === "student") {
-            document.getElementById("student-log").textContent = logText;
-          } else {
-            document.getElementById("admin-log").textContent = logText;
-          }
-
-          window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
+          // Save to local attendance log for admin view
+          attendanceLog.push({ name: currentUser, time: now });
+        } else {
+          logElem.innerHTML = `<p style="color:#f87171">Error logging attendance: ${data.error}</p>`;
         }
-      })
-      .catch(err => {
-        alert("Error logging attendance.");
-      });
+      } catch (err) {
+        document.getElementById("log").innerHTML = `<p style="color:#f87171">Server error logging attendance.</p>`;
+      }
+    }
+
+    function showAdminPanel() {
+      document.getElementById("admin-panel").style.display = "block";
+      const adminLog = document.getElementById("admin-log");
+
+      if (attendanceLog.length === 0) {
+        adminLog.innerHTML = "<p>No attendance logs this session.</p>";
+      } else {
+        let html = "<ul>";
+        attendanceLog.forEach(entry => {
+          html += `<li><strong>${entry.name}</strong> joined at ${entry.time}</li>`;
+        });
+        html += "</ul>";
+        adminLog.innerHTML = html;
+      }
+    }
+
+    function joinZoom() {
+      window.open(ZOOM_LINK, "_blank");
     }
 
     function logout() {
       currentUser = "";
       currentRole = "";
-      document.getElementById("login-box").classList.remove("hidden");
-      document.getElementById("student-panel").classList.add("hidden");
-      document.getElementById("admin-panel").classList.add("hidden");
-      document.getElementById("student-log").textContent = "";
-      document.getElementById("admin-log").textContent = "";
-      document.getElementById("login-error").textContent = "";
+      attendanceLog = [];
       document.getElementById("username").value = "";
       document.getElementById("password").value = "";
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("admin-panel").style.display = "none";
+      document.getElementById("login-box").style.display = "block";
+      document.getElementById("log").innerHTML = "";
+      document.getElementById("admin-log").innerHTML = "";
+      document.getElementById("error-msg").textContent = "";
     }
   </script>
+
 </body>
 </html>
