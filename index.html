@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Coding Class</title>
+<title>ding Class</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
 * { box-sizing: border-box; }
@@ -121,6 +121,7 @@ button:hover { background:#0284c7; color:#e0f2fe; }
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <script>
+// Replace these values with your Firebase project details
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -131,7 +132,6 @@ const firebaseConfig = {
   appId: "APP_ID"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const database = firebase.database();
@@ -146,7 +146,7 @@ const userMap = {
 let currentUser = "";
 let currentRole = "";
 
-// Login function
+// LOGIN
 function login() {
   const username = document.getElementById("username").value.trim().toLowerCase();
   const password = document.getElementById("password").value.trim();
@@ -158,6 +158,7 @@ function login() {
   }
 
   const email = userMap[username];
+
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       currentUser = username;
@@ -170,16 +171,15 @@ function login() {
     })
     .catch(error => {
       console.error(error);
-      errorMsg.textContent = error.message;
+      errorMsg.textContent = "Login failed: " + error.message;
     });
 }
 
-// Save attendance in Realtime Database
+// Save attendance
 function saveAttendanceRealtime(user) {
   const now = new Date().toISOString();
   const attendanceRef = database.ref('attendance');
-  const newRecord = attendanceRef.push();
-  newRecord.set({ name: user, time: now });
+  attendanceRef.push({ name: user, time: now });
 }
 
 // Show student dashboard
@@ -238,7 +238,7 @@ function exportCSV() {
   });
 }
 
-// Join Zoom
+// Zoom link
 function joinZoom() {
   window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
 }
