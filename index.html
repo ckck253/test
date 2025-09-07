@@ -3,73 +3,17 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ding Class</title>
+<title>Coding Class</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
 * { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  color: #cbd5e1;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-.container {
-  background: #0f172a;
-  padding: 30px 40px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(100,116,139,0.6);
-  max-width: 480px;
-  width: 100%;
-}
-h1,h2 {
-  font-family: 'Fira Code', monospace;
-  text-align: center;
-  color: #38bdf8;
-  margin-bottom: 1rem;
-  user-select: none;
-  text-shadow: 0 0 5px #38bdf8;
-}
+body { margin:0; font-family:'Roboto',sans-serif; background:linear-gradient(135deg,#1e293b,#0f172a); color:#cbd5e1; min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+.container { background:#0f172a; padding:30px 40px; border-radius:12px; box-shadow:0 8px 24px rgba(100,116,139,0.6); max-width:480px; width:100%; }
+h1,h2 { font-family:'Fira Code',monospace; text-align:center; color:#38bdf8; margin-bottom:1rem; user-select:none; text-shadow:0 0 5px #38bdf8; }
 label { display:block; margin-bottom:6px; font-weight:600; color:#94a3b8; }
-input[type="text"],input[type="password"] {
-  width:100%;
-  padding:12px 14px;
-  margin-bottom:20px;
-  border-radius:8px;
-  border:none;
-  font-size:1rem;
-  font-family:'Fira Code',monospace;
-  background:#1e293b;
-  color:#cbd5e1;
-  box-shadow: inset 0 0 8px #0f172a;
-  transition: box-shadow 0.3s ease;
-}
-input[type="text"]:focus,input[type="password"]:focus {
-  outline:none;
-  box-shadow: 0 0 12px #38bdf8;
-  background:#152238;
-}
-button {
-  width:100%;
-  padding:14px 0;
-  border:none;
-  border-radius:10px;
-  background:#0ea5e9;
-  color:#0f172a;
-  font-size:1.1rem;
-  font-weight:700;
-  cursor:pointer;
-  letter-spacing:0.05em;
-  font-family:'Fira Code',monospace;
-  transition: background-color 0.3s ease;
-  user-select:none;
-  box-shadow:0 4px 12px #38bdf8aa;
-  margin-bottom:10px;
-}
+input[type="text"],input[type="password"] { width:100%; padding:12px 14px; margin-bottom:20px; border-radius:8px; border:none; font-size:1rem; font-family:'Fira Code',monospace; background:#1e293b; color:#cbd5e1; box-shadow: inset 0 0 8px #0f172a; transition: box-shadow 0.3s ease; }
+input[type="text"]:focus,input[type="password"]:focus { outline:none; box-shadow:0 0 12px #38bdf8; background:#152238; }
+button { width:100%; padding:14px 0; border:none; border-radius:10px; background:#0ea5e9; color:#0f172a; font-size:1.1rem; font-weight:700; cursor:pointer; letter-spacing:0.05em; font-family:'Fira Code',monospace; transition:background-color 0.3s ease; user-select:none; box-shadow:0 4px 12px #38bdf8aa; margin-bottom:10px; }
 button:hover { background:#0284c7; color:#e0f2fe; }
 #error-msg { color:#f87171; text-align:center; margin-bottom:15px; font-weight:700; user-select:none; }
 #dashboard,#admin-panel { display:none; }
@@ -84,35 +28,36 @@ button:hover { background:#0284c7; color:#e0f2fe; }
 </head>
 <body>
 <div class="container">
-  <!-- LOGIN BOX -->
-  <div id="login-box">
-    <h1>Welcome to Coding Class</h1>
-    <label for="username">Username</label>
-    <input type="text" id="username" placeholder="Enter your username" autocomplete="off" />
-    <label for="password">Password</label>
-    <input type="password" id="password" placeholder="Enter your password" autocomplete="off" />
-    <button onclick="login()">Login</button>
-    <div id="error-msg"></div>
-  </div>
 
-  <!-- STUDENT DASHBOARD -->
-  <div id="dashboard">
-    <div class="welcome">Hello, <span id="student-name"></span>!</div>
-    <div class="info">Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</div>
-    <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
-    <div class="log" id="log"></div>
-    <button class="btn-logout" onclick="logout()">Logout</button>
-  </div>
+<!-- LOGIN BOX -->
+<div id="login-box">
+  <h1>Welcome to Coding Class</h1>
+  <label for="username">Username</label>
+  <input type="text" id="username" placeholder="Enter your username" autocomplete="off" />
+  <label for="password">Password</label>
+  <input type="password" id="password" placeholder="Enter your password" autocomplete="off" />
+  <button onclick="login()">Login</button>
+  <div id="error-msg"></div>
+</div>
 
-  <!-- ADMIN PANEL -->
-  <div id="admin-panel">
-    <h2>Admin Panel</h2>
-    <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
-    <div class="info" style="margin-top: 10px;">Attendance log:</div>
-    <div class="log" id="admin-log"></div>
-    <button class="btn-zoom" onclick="exportCSV()">Export Attendance CSV</button>
-    <button class="btn-logout" onclick="logout()">Logout</button>
-  </div>
+<!-- STUDENT DASHBOARD -->
+<div id="dashboard">
+  <div class="welcome">Hello, <span id="student-name"></span>!</div>
+  <div class="info">Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</div>
+  <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+  <div class="log" id="log"></div>
+  <button class="btn-logout" onclick="logout()">Logout</button>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <h2>Admin Panel</h2>
+  <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+  <div class="info" style="margin-top: 10px;">Attendance log:</div>
+  <div class="log" id="admin-log"></div>
+  <button class="btn-zoom" onclick="exportCSV()">Export Attendance CSV</button>
+  <button class="btn-logout" onclick="logout()">Logout</button>
+</div>
 </div>
 
 <!-- Firebase SDK -->
@@ -133,89 +78,89 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Users (keep your working login)
+// USERS
 const users = {
-  joel: { password: "joel123", role: "student" },
-  ali: { password: "ali456", role: "student" },
-  sara: { password: "sara789", role: "student" },
-  teacher: { password: "teach123", role: "admin" }
+  joel:{password:"joel123",role:"student"},
+  ali:{password:"ali456",role:"student"},
+  sara:{password:"sara789",role:"student"},
+  teacher:{password:"teach123",role:"admin"}
 };
 
-let currentUser = "";
-let currentRole = "";
+let currentUser="";
+let currentRole="";
 
 // LOGIN
-function login() {
-  const username = document.getElementById("username").value.trim().toLowerCase();
-  const pass = document.getElementById("password").value.trim();
-  const errorMsg = document.getElementById("error-msg");
+function login(){
+  const username=document.getElementById("username").value.trim().toLowerCase();
+  const pass=document.getElementById("password").value.trim();
+  const errorMsg=document.getElementById("error-msg");
 
-  if(users[username] && users[username].password === pass){
-    currentUser = username;
-    currentRole = users[username].role;
-    errorMsg.textContent = "";
-    document.getElementById("login-box").style.display = "none";
+  if(users[username] && users[username].password===pass){
+    currentUser=username;
+    currentRole=users[username].role;
+    errorMsg.textContent="";
+    document.getElementById("login-box").style.display="none";
 
-    if(currentRole === "student") showStudentDashboard();
+    if(currentRole==="student") showStudentDashboard();
     else showAdminPanel();
   } else {
-    errorMsg.textContent = "Incorrect username or password.";
+    errorMsg.textContent="Incorrect username or password.";
   }
 }
 
-// Save attendance permanently
+// Save attendance to Firebase
 function saveAttendance(user){
-  const now = new Date().toISOString();
-  database.ref('attendance').push({name:user, time:now});
+  const now=new Date().toISOString();
+  database.ref('attendance').push({name:user,time:now});
 }
 
-// Student dashboard
+// Show student dashboard
 function showStudentDashboard(){
-  document.getElementById("dashboard").style.display = "block";
-  document.getElementById("student-name").textContent = currentUser;
-
-  const now = new Date().toISOString();
-  document.getElementById("log").innerHTML = `<p><strong>${currentUser}</strong> attendance logged at ${new Date(now).toLocaleString()}</p>`;
-
+  document.getElementById("dashboard").style.display="block";
+  document.getElementById("student-name").textContent=currentUser;
+  const now=new Date().toISOString();
+  document.getElementById("log").innerHTML=`<p><strong>${currentUser}</strong> attendance logged at ${new Date(now).toLocaleString()}</p>`;
   saveAttendance(currentUser);
 }
 
-// Admin panel
+// Show admin panel
 function showAdminPanel(){
-  document.getElementById("admin-panel").style.display = "block";
-  const adminLog = document.getElementById("admin-log");
+  document.getElementById("admin-panel").style.display="block";
+  updateAdminLog();
+}
 
-  database.ref('attendance').once('value', snapshot=>{
+// Fetch and display admin log
+function updateAdminLog(){
+  const adminLog=document.getElementById("admin-log");
+  database.ref('attendance').once('value',snapshot=>{
     if(!snapshot.exists()){
-      adminLog.innerHTML = "<p>No attendance records yet.</p>";
+      adminLog.innerHTML="<p>No attendance records yet.</p>";
       return;
     }
-    let html = "<ul>";
+    let html="<ul>";
     snapshot.forEach(child=>{
-      const data = child.val();
-      html += `<li><strong>${data.name}</strong> joined at ${new Date(data.time).toLocaleString()}</li>`;
+      const data=child.val();
+      html+=`<li><strong>${data.name}</strong> joined at ${new Date(data.time).toLocaleString()}</li>`;
     });
-    html += "</ul>";
-    adminLog.innerHTML = html;
+    html+="</ul>";
+    adminLog.innerHTML=html;
   });
 }
 
 // Export CSV
 function exportCSV(){
-  database.ref('attendance').once('value', snapshot=>{
+  database.ref('attendance').once('value',snapshot=>{
     if(!snapshot.exists()){ alert("No data to export"); return; }
-
-    let csv = "Name,Time\n";
+    let csv="Name,Time\n";
     snapshot.forEach(child=>{
-      const data = child.val();
-      csv += `${data.name},${new Date(data.time).toLocaleString()}\n`;
+      const data=child.val();
+      csv+=`${data.name},${new Date(data.time).toLocaleString()}\n`;
     });
-
-    const blob = new Blob([csv], {type:"text/csv"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "attendance_log.csv";
+    const blob=new Blob([csv],{type:"text/csv"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download="attendance_log.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -224,9 +169,7 @@ function exportCSV(){
 }
 
 // Zoom
-function joinZoom(){
-  window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank");
-}
+function joinZoom(){ window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank"); }
 
 // Logout
 function logout(){
