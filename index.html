@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Coding Class</title>
+<title>ding Class</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
 * { box-sizing: border-box; }
@@ -115,13 +115,12 @@ button:hover { background:#0284c7; color:#e0f2fe; }
   </div>
 </div>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"></script>
 
 <script>
-// Replace with your Firebase project details
+// Firebase config
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
   authDomain: "YOUR_PROJECT.firebaseapp.com",
@@ -131,17 +130,15 @@ const firebaseConfig = {
   messagingSenderId: "SENDER_ID",
   appId: "APP_ID"
 };
-
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const database = firebase.database();
 
-// Map usernames to Firebase emails
-const userMap = {
-  joel: "joel@codingclass.com",
-  ali: "ali@codingclass.com",
-  sara: "sara@codingclass.com",
-  teacher: "teacher@codingclass.com"
+// Users (keep your working login)
+const users = {
+  joel: { password: "joel123", role: "student" },
+  ali: { password: "ali456", role: "student" },
+  sara: { password: "sara789", role: "student" },
+  teacher: { password: "teach123", role: "admin" }
 };
 
 let currentUser = "";
@@ -150,61 +147,51 @@ let currentRole = "";
 // LOGIN
 function login() {
   const username = document.getElementById("username").value.trim().toLowerCase();
-  const password = document.getElementById("password").value.trim();
+  const pass = document.getElementById("password").value.trim();
   const errorMsg = document.getElementById("error-msg");
 
-  if (!userMap[username]) {
-    errorMsg.textContent = "Unknown username.";
-    return;
+  if(users[username] && users[username].password === pass){
+    currentUser = username;
+    currentRole = users[username].role;
+    errorMsg.textContent = "";
+    document.getElementById("login-box").style.display = "none";
+
+    if(currentRole === "student") showStudentDashboard();
+    else showAdminPanel();
+  } else {
+    errorMsg.textContent = "Incorrect username or password.";
   }
-
-  const email = userMap[username];
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      currentUser = username;
-      currentRole = username === "teacher" ? "admin" : "student";
-      errorMsg.textContent = "";
-      document.getElementById("login-box").style.display = "none";
-
-      if (currentRole === "student") showStudentDashboard();
-      else showAdminPanel();
-    })
-    .catch(error => {
-      console.error(error);
-      errorMsg.textContent = "Login failed: " + error.message;
-    });
 }
 
-// Save attendance
-function saveAttendanceRealtime(user) {
+// Save attendance permanently
+function saveAttendance(user){
   const now = new Date().toISOString();
-  database.ref('attendance').push({ name: user, time: now });
+  database.ref('attendance').push({name:user, time:now});
 }
 
-// Show student dashboard
-function showStudentDashboard() {
+// Student dashboard
+function showStudentDashboard(){
   document.getElementById("dashboard").style.display = "block";
   document.getElementById("student-name").textContent = currentUser;
 
   const now = new Date().toISOString();
   document.getElementById("log").innerHTML = `<p><strong>${currentUser}</strong> attendance logged at ${new Date(now).toLocaleString()}</p>`;
 
-  saveAttendanceRealtime(currentUser);
+  saveAttendance(currentUser);
 }
 
-// Show admin panel
-function showAdminPanel() {
+// Admin panel
+function showAdminPanel(){
   document.getElementById("admin-panel").style.display = "block";
   const adminLog = document.getElementById("admin-log");
 
-  database.ref('attendance').once('value', snapshot => {
-    if (!snapshot.exists()) {
+  database.ref('attendance').once('value', snapshot=>{
+    if(!snapshot.exists()){
       adminLog.innerHTML = "<p>No attendance records yet.</p>";
       return;
     }
     let html = "<ul>";
-    snapshot.forEach(child => {
+    snapshot.forEach(child=>{
       const data = child.val();
       html += `<li><strong>${data.name}</strong> joined at ${new Date(data.time).toLocaleString()}</li>`;
     });
@@ -214,17 +201,17 @@ function showAdminPanel() {
 }
 
 // Export CSV
-function exportCSV() {
-  database.ref('attendance').once('value', snapshot => {
-    if (!snapshot.exists()) { alert("No data to export"); return; }
+function exportCSV(){
+  database.ref('attendance').once('value', snapshot=>{
+    if(!snapshot.exists()){ alert("No data to export"); return; }
 
     let csv = "Name,Time\n";
-    snapshot.forEach(child => {
+    snapshot.forEach(child=>{
       const data = child.val();
       csv += `${data.name},${new Date(data.time).toLocaleString()}\n`;
     });
 
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = new Blob([csv], {type:"text/csv"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -236,25 +223,23 @@ function exportCSV() {
   });
 }
 
-// Join Zoom
-function joinZoom() {
-  window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1", "_blank");
+// Zoom
+function joinZoom(){
+  window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank");
 }
 
 // Logout
-function logout() {
-  auth.signOut().then(() => {
-    currentUser = "";
-    currentRole = "";
-    document.getElementById("username").value = "";
-    document.getElementById("password").value = "";
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("admin-panel").style.display = "none";
-    document.getElementById("login-box").style.display = "block";
-    document.getElementById("log").innerHTML = "";
-    document.getElementById("admin-log").innerHTML = "";
-    document.getElementById("error-msg").textContent = "";
-  });
+function logout(){
+  currentUser="";
+  currentRole="";
+  document.getElementById("username").value="";
+  document.getElementById("password").value="";
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("admin-panel").style.display="none";
+  document.getElementById("login-box").style.display="block";
+  document.getElementById("log").innerHTML="";
+  document.getElementById("admin-log").innerHTML="";
+  document.getElementById("error-msg").textContent="";
 }
 </script>
 </body>
