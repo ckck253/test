@@ -207,36 +207,40 @@
     teacher: "teacher@codingclass.com"
   };
 
-  function login() {
-    const usernameInput = document.getElementById("username").value.trim().toLowerCase();
-    const passInput = document.getElementById("password").value.trim();
-    const errorMsg = document.getElementById("error-msg");
+ function login() {
+  const usernameInput = document.getElementById("username").value.trim().toLowerCase();
+  const passInput = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("error-msg");
 
-    if (!userMap[usernameInput]) {
-      errorMsg.textContent = "Unknown username.";
-      return;
-    }
-
-    const email = userMap[usernameInput];
-
-    auth.signInWithEmailAndPassword(email, passInput)
-      .then((userCredential) => {
-        currentUser = usernameInput;
-        currentRole = (usernameInput === "teacher") ? "admin" : "student";
-
-        errorMsg.textContent = "";
-        document.getElementById("login-box").style.display = "none";
-
-        if (currentRole === "student") {
-          showStudentDashboard();
-        } else if (currentRole === "admin") {
-          showAdminPanel();
-        }
-      })
-      .catch((error) => {
-        errorMsg.textContent = "Login failed: " + error.message;
-      });
+  if (!userMap[usernameInput]) {
+    errorMsg.textContent = "Unknown username.";
+    return;
   }
+
+  const email = userMap[usernameInput];
+  console.log("Trying login with:", email, passInput); // 👈 DEBUG
+
+  auth.signInWithEmailAndPassword(email, passInput)
+    .then((userCredential) => {
+      console.log("Login success:", userCredential.user); // 👈 DEBUG
+      currentUser = usernameInput;
+      currentRole = (usernameInput === "teacher") ? "admin" : "student";
+
+      errorMsg.textContent = "";
+      document.getElementById("login-box").style.display = "none";
+
+      if (currentRole === "student") {
+        showStudentDashboard();
+      } else if (currentRole === "admin") {
+        showAdminPanel();
+      }
+    })
+    .catch((error) => {
+      console.error("Login failed:", error); // 👈 DEBUG
+      errorMsg.textContent = "Login failed: " + error.message;
+    });
+}
+
 
   function showStudentDashboard() {
     document.getElementById("dashboard").style.display = "block";
