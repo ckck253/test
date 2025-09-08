@@ -234,26 +234,32 @@
     let currentRole = "";
 
     // Login
-    function login() {
-      const userInput = document.getElementById("username").value.trim().toLowerCase();
-      const passInput = document.getElementById("password").value.trim();
-      const errorMsg = document.getElementById("error-msg");
+   function login() {
+  const userInput = document.getElementById("username").value.trim().toLowerCase();
+  const passInput = document.getElementById("password").value.trim();
+  const errorMsg = document.getElementById("error-msg");
 
-      if (users[userInput] && users[userInput].password === passInput) {
-        currentUser = userInput;
-        currentRole = users[userInput].role;
-        errorMsg.textContent = "";
-        document.getElementById("login-box").style.display = "none";
+  console.log("Trying login with:", userInput, passInput);
 
-        if (currentRole === "student") {
-          showStudentDashboard();
-        } else {
-          showAdminPanel();
-        }
-      } else {
-        errorMsg.textContent = "❌ Incorrect username or password.";
-      }
+  if (users[userInput] && users[userInput].password === passInput) {
+    currentUser = userInput;
+    currentRole = users[userInput].role;
+    console.log("✅ Login successful as", currentRole);
+
+    errorMsg.textContent = "";
+    document.getElementById("login-box").style.display = "none";
+
+    if (currentRole === "student") {
+      showStudentDashboard();
+    } else {
+      showAdminPanel();
     }
+  } else {
+    console.log("❌ Wrong credentials");
+    errorMsg.textContent = "❌ Incorrect username or password.";
+  }
+}
+
 
     // Student Dashboard
     function showStudentDashboard() {
