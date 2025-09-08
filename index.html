@@ -126,59 +126,44 @@ function proceedLogin() {
   else showAdminPanel();
 }
 
+// Student Dashboard
 function showStudentDashboard() {
   document.getElementById("dashboard").style.display = "block";
   document.getElementById("student-name").textContent = currentUser;
+
   const now = new Date().toLocaleString();
-  document.getElementById("log").innerHTML = `<p><strong>${currentUser}</strong> attendance logged at ${now}</p>`;
+
+  // Push every login permanently to Firebase
   db.ref("attendance").push({ name: currentUser, time: now });
+
+  // Show in page log
+  const logElem = document.getElementById("log");
+  logElem.innerHTML += `<p><strong>${currentUser}</strong> attendance logged at ${now}</p>`;
 }
 
+// Admin Panel
 function showAdminPanel() {
   document.getElementById("admin-panel").style.display = "block";
   const adminLog = document.getElementById("admin-log");
+
   db.ref("attendance").on("value", snapshot => {
     if (!snapshot.exists()) { adminLog.innerHTML = "<p>No attendance yet.</p>"; return; }
     let html = "<ul>";
-    snapshot.forEach(c => { const d = c.val(); html += `<li><strong>${d.name}</strong> - ${d.time}</li>`; });
-    adminLog.innerHTML = html + "</ul>";
+    snapshot.forEach(c => { html += `<li><strong>${c.val().name}</strong> at ${c.val().time}</li>`; });
+    html += "</ul>";
+    adminLog.innerHTML = html;
   });
 }
 
-function addStudent() {
-  const email = document.getElementById("new-student-email").value.trim();
-  const pass = document.getElementById("new-student-pass").value.trim();
-  const msg = document.getElementById("add-student-msg");
-
-  if (!email || !pass) { msg.style.color = "#f87171"; msg.textContent = "Enter email & password"; return; }
-
-  auth.createUserWithEmailAndPassword(email, pass)
-    .then(cred => {
-      db.ref('roles/' + encodeEmail(email)).set('student');
-      msg.style.color = "#22c55e";
-      msg.textContent = `Student ${email} added successfully!`;
-      document.getElementById("new-student-email").value = '';
-      document.getElementById("new-student-pass").value = '';
-    })
-    .catch(error => { msg.style.color = "#f87171"; msg.textContent = error.message; });
+// Join Zoom
+function joinZoom() {
+  window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank");
 }
 
-function exportCSV() {
-  db.ref("attendance").once("value").then(snapshot => {
-    if (!snapshot.exists()) { alert("No data"); return; }
-    const rows = [["Name","Time"]];
-    snapshot.forEach(c => rows.push([c.val().name, c.val().time]));
-    const csv = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "attendance.csv"; a.click(); URL.revokeObjectURL(url);
-  });
-}
-
-function joinZoom() { window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank"); }
-
+// Logout
 function logout() {
-  currentUser = ""; currentRole = "";
+  currentUser = "";
+  currentRole = "";
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
   document.getElementById("dashboard").style.display = "none";
@@ -189,7 +174,44 @@ function logout() {
   document.getElementById("error-msg").textContent = "";
 }
 
-function encodeEmail(email) { return email.replace(/\./g,','); } // Firebase keys can't have dot
+// Export CSV
+function exportCSV() {
+  db.ref("attendance").once("value").then(snapshot => {
+    if (!snapshot.exists()) { alert("No data"); return; }
+    const rows = [["Name","Time"]];
+    snapshot.forEach(c => rows.push([c.val().name, c.val().time]));
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "attendance.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+// Add new student
+function addStudent() {
+  const email = document.getElementById("new-student-email").value.trim();
+  const pass = document.getElementById("new-student-pass").value.trim();
+  const msg = document.getElementById("add-student-msg");
+  if (!email || !pass) { msg.textContent = "Email & password required"; return; }
+
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(() => {
+      db.ref('roles/' + encodeEmail(email)).set('student');
+      msg.textContent = "Student added!";
+      document.getElementById("new-student-email").value = "";
+      document.getElementById("new-student-pass").value = "";
+    })
+    .catch(e => { msg.textContent = e.message; });
+}
+
+// Encode email to use as Firebase key
+function encodeEmail(email) {
+  return email.replace(/\./g, ',');
+}
 </script>
 </body>
 </html>
