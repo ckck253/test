@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Coding Class</title>
+<title>oding Class</title>
 <style>
-/* Keep your existing CSS exactly the same as before */
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;700&display=swap');
 * { box-sizing: border-box; }
 body {
@@ -40,6 +39,7 @@ button:hover { background: #0284c7; color: #e0f2fe; }
 <body>
 <div class="container">
 
+  <!-- LOGIN BOX -->
   <div id="login-box">
     <h1>Welcome to Coding Class</h1>
     <label for="email">Email</label>
@@ -50,6 +50,7 @@ button:hover { background: #0284c7; color: #e0f2fe; }
     <div id="error-msg"></div>
   </div>
 
+  <!-- STUDENT DASHBOARD -->
   <div id="dashboard">
     <div class="welcome">Hello, <span id="student-name"></span>!</div>
     <div class="info">Class every Monday at 8:30 PM Lebanon / 6:30 PM UK</div>
@@ -58,25 +59,25 @@ button:hover { background: #0284c7; color: #e0f2fe; }
     <button class="btn-logout" onclick="logout()">Logout</button>
   </div>
 
- <!-- ADMIN PANEL -->
-<div id="admin-panel">
-  <h2>Admin Panel</h2>
-  <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
-  <button onclick="exportCSV()">Export Attendance CSV</button>
+  <!-- ADMIN PANEL -->
+  <div id="admin-panel">
+    <h2>Admin Panel</h2>
+    <button class="btn-zoom" onclick="joinZoom()">Join Zoom Class</button>
+    <button onclick="exportCSV()">Export Attendance CSV</button>
 
-  <!-- Add Student Form -->
-  <div style="margin: 15px 0; text-align:center;">
-    <h3 style="color:#38bdf8;">Add New Student</h3>
-    <input type="email" id="new-student-email" placeholder="Student Email" />
-    <input type="password" id="new-student-pass" placeholder="Student Password" />
-    <button onclick="addStudent()">Add Student</button>
-    <div id="add-student-msg" style="color:#22c55e; margin-top:5px;"></div>
+    <!-- Add Student Form -->
+    <div style="margin: 15px 0; text-align:center;">
+      <h3 style="color:#38bdf8;">Add New Student</h3>
+      <input type="email" id="new-student-email" placeholder="Student Email" />
+      <input type="password" id="new-student-pass" placeholder="Student Password" />
+      <button onclick="addStudent()">Add Student</button>
+      <div id="add-student-msg" style="color:#22c55e; margin-top:5px;"></div>
+    </div>
+
+    <div class="info">Attendance log:</div>
+    <div class="log" id="admin-log"></div>
+    <button class="btn-logout" onclick="logout()">Logout</button>
   </div>
-
-  <div class="info">Attendance log:</div>
-  <div class="log" id="admin-log"></div>
-  <button class="btn-logout" onclick="logout()">Logout</button>
-</div>
 
 </div>
 
@@ -111,9 +112,8 @@ function login() {
   auth.signInWithEmailAndPassword(email, password)
     .then(cred => {
       currentUser = cred.user.email;
-      // Get role from DB
       db.ref('roles/' + encodeEmail(currentUser)).once('value').then(snapshot => {
-        currentRole = snapshot.val() || 'student'; // default student
+        currentRole = snapshot.val() || 'student';
         proceedLogin();
       });
     })
@@ -144,7 +144,8 @@ function showAdminPanel() {
     adminLog.innerHTML = html + "</ul>";
   });
 }
-  function addStudent() {
+
+function addStudent() {
   const email = document.getElementById("new-student-email").value.trim();
   const pass = document.getElementById("new-student-pass").value.trim();
   const msg = document.getElementById("add-student-msg");
@@ -153,20 +154,14 @@ function showAdminPanel() {
 
   auth.createUserWithEmailAndPassword(email, pass)
     .then(cred => {
-      // Save role in database
       db.ref('roles/' + encodeEmail(email)).set('student');
       msg.style.color = "#22c55e";
       msg.textContent = `Student ${email} added successfully!`;
-      // Clear inputs
       document.getElementById("new-student-email").value = '';
       document.getElementById("new-student-pass").value = '';
     })
-    .catch(error => {
-      msg.style.color = "#f87171";
-      msg.textContent = error.message;
-    });
+    .catch(error => { msg.style.color = "#f87171"; msg.textContent = error.message; });
 }
-
 
 function exportCSV() {
   db.ref("attendance").once("value").then(snapshot => {
@@ -181,9 +176,20 @@ function exportCSV() {
 }
 
 function joinZoom() { window.open("https://us05web.zoom.us/j/85772820738?pwd=a41FF2MAs6cvlSsovfJzzaG2Sh4gLP.1","_blank"); }
-function logout() { currentUser = ""; currentRole = ""; document.getElementById("email").value = ""; document.getElementById("password").value = ""; document.getElementById("dashboard").style.display = "none"; document.getElementById("admin-panel").style.display = "none"; document.getElementById("login-box").style.display = "block"; document.getElementById("log").innerHTML=""; document.getElementById("admin-log").innerHTML=""; document.getElementById("error-msg").textContent=""; }
 
-function encodeEmail(email) { return email.replace('.',','); } // Firebase keys can't have dot
+function logout() {
+  currentUser = ""; currentRole = "";
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("admin-panel").style.display = "none";
+  document.getElementById("login-box").style.display = "block";
+  document.getElementById("log").innerHTML = "";
+  document.getElementById("admin-log").innerHTML = "";
+  document.getElementById("error-msg").textContent = "";
+}
+
+function encodeEmail(email) { return email.replace(/\./g,','); } // Firebase keys can't have dot
 </script>
 </body>
 </html>
